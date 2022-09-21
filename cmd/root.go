@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 Julius Pedersen
-
-*/
 package cmd
 
 import (
