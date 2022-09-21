@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/deifyed/topbg/pkg/reddit"
 	"github.com/deifyed/topbg/pkg/wm"
@@ -36,7 +37,12 @@ var SetCmd = &cobra.Command{
 			imageURLs = append(imageURLs, urls...)
 		}
 
+		log.Debugf("Found URLs: %v", imageURLs)
+
+		rand.Seed(time.Now().Unix())
 		relevantURL := imageURLs[rand.Intn(len(imageURLs))]
+
+		log.Debugf("Chose URL %s", relevantURL)
 
 		image, err := reddit.DownloadImage(relevantURL)
 		if err != nil {
