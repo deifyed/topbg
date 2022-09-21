@@ -8,26 +8,13 @@ import (
 	"strings"
 )
 
-func GetSubreddit(name string) ([]Image, error) {
+func GetSubreddit(name string) ([]string, error) {
         posts, err := fetchTopPostsInSubreddit(name, 5)
         if err != nil {
                 return nil, fmt.Errorf("fetching posts: %w", err)
         }
 
-        urls := extractURLs(posts)
-
-        images := make([]Image, len(urls))
-
-        for index, url := range urls {
-                img, err := downloadImage(url)
-                if err != nil {
-                        return nil, fmt.Errorf("downloading %s: %w", url, err)
-                }
-
-                images[index] = img
-        }
-
-        return images, nil
+        return extractURLs(posts), nil
 }
 
 func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild, error) {
@@ -71,7 +58,7 @@ func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild
         return relevantPosts, nil
 }
 
-func downloadImage(url string) (Image, error) {
+func DownloadImage(url string) (Image, error) {
         response, err := http.Get(url)
         if err != nil {
                 return Image{}, fmt.Errorf("fetching: %w", err)

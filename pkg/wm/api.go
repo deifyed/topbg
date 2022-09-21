@@ -11,7 +11,7 @@ import (
 )
 
 func SetBackground(fs *afero.Afero, imageType string, image io.Reader) error {
-        imagePath := path.Join(fs.GetTempDir(), fmt.Sprintf("current-topbg.%s", imageType))
+        imagePath := path.Join(fs.GetTempDir(""), fmt.Sprintf("current-topbg.%s", imageType))
 
         err := fs.WriteReader(imagePath, image)
         if err != nil {
