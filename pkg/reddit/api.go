@@ -10,7 +10,7 @@ import (
 )
 
 func GetSubreddit(log Logger, name string) ([]string, error) {
-	log.Debugf("Fetching %s\n", name)
+	log.Debugf("Fetching %s", name)
 
 	posts, err := fetchTopPostsInSubreddit(log, name, 5)
 	if err != nil {
