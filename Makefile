@@ -13,3 +13,5 @@ install: build
 	mkdir -p $(INSTALL_DIR)
 	cp topbg $(INSTALL_DIR)
 
+clean:
+	rm topbg
