@@ -22,13 +22,14 @@ var SetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
                 subreddits := []string{"earthporn", "abandonedporn"}
                 fs := &afero.Afero{Fs: afero.NewOsFs()}
+                log := createLogger()
 
                 imageURLs := make([]string, 0)
 
                 for _, subreddit := range subreddits {
-                        urls, err := reddit.GetSubreddit(subreddit)
+                        urls, err := reddit.GetSubreddit(log, subreddit)
                         if err != nil {
-                                return fmt.Errorf("fetching subreddit: %w", err)
+                                return fmt.Errorf("fetching subreddit %s: %w", subreddit, err)
                         }
 
                         imageURLs = append(imageURLs, urls...)

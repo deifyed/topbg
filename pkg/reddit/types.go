@@ -24,4 +24,9 @@ type topPostsResult struct {
         Data topPostsResultData `json:"data"`
 }
 
-const urlTemplate = "https://www.reddit.com/r/%s.json?limit=3"
+const urlTemplate = "https://www.reddit.com/r/%s.json?limit=%d"
+
+type Logger interface {
+        Debug(...interface{})
+        Debugf(string, ...interface{})
+}
