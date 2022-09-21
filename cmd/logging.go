@@ -7,13 +7,12 @@ import (
 )
 
 func createLogger() *logrus.Logger {
-        log := logrus.Logger{}
+	log := logrus.Logger{}
 
-        log.Formatter = &logrus.JSONFormatter{ PrettyPrint: true }
-        log.Out = os.Stdout
+	log.Formatter = &logrus.JSONFormatter{PrettyPrint: true}
+	log.Out = os.Stdout
 
-        log.Level = logrus.DebugLevel
+	log.Level = logrus.DebugLevel
 
-        return &log
+	return &log
 }
-
