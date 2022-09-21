@@ -22,7 +22,7 @@ var SetCmd = &cobra.Command{
 	Long:  `Grabs a random image from the configured list of subreddits`,
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		subreddits := []string{"earthporn", "abandonedporn"}
+		subreddits := []string{"earthporn", "abandonedporn", "dalle2", "midjourney"}
 		fs := &afero.Afero{Fs: afero.NewOsFs()}
 		log := createLogger()
 
