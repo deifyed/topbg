@@ -1,4 +1,4 @@
 .PHONY=fmt
 
 fmt:
-	gofumpt -w ./..
+	@gofmt -w .
