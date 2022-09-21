@@ -19,6 +19,7 @@ var SetCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Set background to a random image",
 	Long:  `Grabs a random image from the configured list of subreddits`,
+	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		subreddits := []string{"earthporn", "abandonedporn"}
 		fs := &afero.Afero{Fs: afero.NewOsFs()}
@@ -35,7 +36,7 @@ var SetCmd = &cobra.Command{
 			imageURLs = append(imageURLs, urls...)
 		}
 
-		relevantURL := imageURLs[rand.Intn(len(imageURLs)-0)]
+		relevantURL := imageURLs[rand.Intn(len(imageURLs))]
 
 		image, err := reddit.DownloadImage(relevantURL)
 		if err != nil {
