@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -13,8 +14,8 @@ func createLogger() *logrus.Logger {
 	log.Out = os.Stdout
 	log.Level = logrus.InfoLevel
 
-	switch os.Getenv("TOPBG_DEBUG_LEVEL") {
-	case "DEBUG":
+	switch strings.ToLower(os.Getenv("TOPBG_LOG_LEVEL")) {
+	case "debug":
 		log.Level = logrus.DebugLevel
 	default:
 		break
