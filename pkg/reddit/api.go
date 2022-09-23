@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var validExtensions = []string{"jpg", "png"}
+
 func GetSubreddit(name string) ([]string, error) {
 	posts, err := fetchTopPostsInSubreddit(name, 5)
 	if err != nil {
@@ -83,6 +85,30 @@ func DownloadImage(url string) (Image, error) {
 	}, nil
 }
 
+func valid(item topPostsResultDataChild) bool {
+	if item.Data.Stickied {
+		return false
+	}
+
+	url := strings.ReplaceAll(item.Data.URL, " ", "")
+
+	if url == "" {
+		return false
+	}
+
+	if strings.Contains(url, "gallery") {
+		return false
+	}
+
+	extension := strings.ToLower(reverse(strings.Split(url, "."))[0])
+
+	if !contains(validExtensions, extension) {
+		return false
+	}
+
+	return true
+}
+
 func reverse(items []string) []string {
 	reversed := make([]string, len(items))
 	reversedIndex := len(items) - 1
@@ -106,20 +132,12 @@ func extractURLs(items []topPostsResultDataChild) []string {
 	return urls
 }
 
-func valid(item topPostsResultDataChild) bool {
-	if item.Data.Stickied {
-		return false
+func contains(haystack []string, needle string) bool {
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
 	}
 
-	url := strings.ReplaceAll(item.Data.URL, " ", "")
-
-	if url == "" {
-		return false
-	}
-
-	if strings.Contains(url, "gallery") {
-		return false
-	}
-
-	return true
+	return false
 }
