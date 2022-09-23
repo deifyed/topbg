@@ -53,14 +53,15 @@ func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild
 		return nil, fmt.Errorf("unmarshalling: %w", err)
 	}
 
-	relevantPosts := make([]topPostsResultDataChild, limit)
-	relevantIndex := 0
+	relevantPosts := make([]topPostsResultDataChild, 0)
 
-	for i := 0; i < limit; i++ {
-		if valid(result.Data.Children[i]) {
-			relevantPosts[relevantIndex] = result.Data.Children[i]
+	for _, child := range result.Data.Children {
+		if len(relevantPosts) == limit {
+			break
+		}
 
-			relevantIndex++
+		if valid(child) {
+			relevantPosts = append(relevantPosts, child)
 		}
 	}
 
