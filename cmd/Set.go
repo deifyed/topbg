@@ -26,45 +26,47 @@ var SetCmd = &cobra.Command{
 
 		return nil
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fs := &afero.Afero{Fs: afero.NewOsFs()}
-		log := createLogger()
+	RunE: setRunE,
+}
 
-		subreddits := viper.GetStringSlice("subreddits")
-		imageURLs := make([]string, 0)
+func setRunE(cmd *cobra.Command, args []string) error {
+	fs := &afero.Afero{Fs: afero.NewOsFs()}
+	log := createLogger()
 
-		log.Debugf("Picking from following subreddits: %v", subreddits)
+	subreddits := viper.GetStringSlice("subreddits")
+	imageURLs := make([]string, 0)
 
-		for _, subreddit := range subreddits {
-			log.Debugf("Fetching %s URLs", subreddit)
+	log.Debugf("Picking from following subreddits: %v", subreddits)
 
-			urls, err := reddit.GetSubreddit(subreddit)
-			if err != nil {
-				return fmt.Errorf("fetching subreddit %s: %w", subreddit, err)
-			}
+	for _, subreddit := range subreddits {
+		log.Debugf("Fetching %s URLs", subreddit)
 
-			imageURLs = append(imageURLs, urls...)
-		}
-
-		log.Debugf("Found URLs: %v", imageURLs)
-
-		rand.Seed(time.Now().Unix())
-		relevantURL := imageURLs[rand.Intn(len(imageURLs))]
-
-		log.Debugf("Chose URL %s", relevantURL)
-
-		image, err := reddit.DownloadImage(relevantURL)
+		urls, err := reddit.GetSubreddit(subreddit)
 		if err != nil {
-			return fmt.Errorf("downloading image: %w", err)
+			return fmt.Errorf("fetching subreddit %s: %w", subreddit, err)
 		}
 
-		err = wm.SetBackground(fs, image.Type, image.Image)
-		if err != nil {
-			return fmt.Errorf("setting background: %w", err)
-		}
+		imageURLs = append(imageURLs, urls...)
+	}
 
-		return nil
-	},
+	log.Debugf("Found URLs: %v", imageURLs)
+
+	rand.Seed(time.Now().Unix())
+	relevantURL := imageURLs[rand.Intn(len(imageURLs))]
+
+	log.Debugf("Chose URL %s", relevantURL)
+
+	image, err := reddit.DownloadImage(relevantURL)
+	if err != nil {
+		return fmt.Errorf("downloading image: %w", err)
+	}
+
+	err = wm.SetBackground(fs, image.Type, image.Image)
+	if err != nil {
+		return fmt.Errorf("setting background: %w", err)
+	}
+
+	return nil
 }
 
 func init() {
