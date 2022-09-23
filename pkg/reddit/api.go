@@ -9,10 +9,8 @@ import (
 	"strings"
 )
 
-func GetSubreddit(log Logger, name string) ([]string, error) {
-	log.Debugf("Fetching %s", name)
-
-	posts, err := fetchTopPostsInSubreddit(log, name, 5)
+func GetSubreddit(name string) ([]string, error) {
+	posts, err := fetchTopPostsInSubreddit(name, 5)
 	if err != nil {
 		return nil, fmt.Errorf("fetching posts: %w", err)
 	}
@@ -20,7 +18,7 @@ func GetSubreddit(log Logger, name string) ([]string, error) {
 	return extractURLs(posts), nil
 }
 
-func fetchTopPostsInSubreddit(log Logger, name string, limit int) ([]topPostsResultDataChild, error) {
+func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild, error) {
 	url := fmt.Sprintf(urlTemplate, name, limit)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -38,14 +36,10 @@ func fetchTopPostsInSubreddit(log Logger, name string, limit int) ([]topPostsRes
 		},
 	}
 
-	log.Debug(request)
-
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("executing request: %w", err)
 	}
-
-	log.Debug(response)
 
 	rawBody, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -53,8 +47,6 @@ func fetchTopPostsInSubreddit(log Logger, name string, limit int) ([]topPostsRes
 	}
 
 	var result topPostsResult
-
-	log.Debugf("%s", rawBody)
 
 	err = json.Unmarshal(rawBody, &result)
 	if err != nil {
@@ -114,5 +106,19 @@ func extractURLs(items []topPostsResultDataChild) []string {
 }
 
 func valid(item topPostsResultDataChild) bool {
-	return !item.Data.Stickied
+	if item.Data.Stickied {
+		return false
+	}
+
+	url := strings.ReplaceAll(item.Data.URL, " ", "")
+
+	if url == "" {
+		return false
+	}
+
+	if strings.Contains(url, "gallery") {
+		return false
+	}
+
+	return true
 }

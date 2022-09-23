@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/deifyed/topbg/pkg/wm"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // SetCmd represents the Set command
@@ -17,15 +19,26 @@ var SetCmd = &cobra.Command{
 	Short: "Set background to a random image",
 	Long:  `Grabs a random image from the configured list of subreddits`,
 	Args:  cobra.ExactArgs(0),
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if len(viper.GetStringSlice("subreddits")) == 0 {
+			return errors.New("no subreddits configured")
+		}
+
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		subreddits := []string{"earthporn", "abandonedporn", "dalle2", "midjourney"}
 		fs := &afero.Afero{Fs: afero.NewOsFs()}
 		log := createLogger()
 
+		subreddits := viper.GetStringSlice("subreddits")
 		imageURLs := make([]string, 0)
 
+		log.Debugf("Picking from following subreddits: %v", subreddits)
+
 		for _, subreddit := range subreddits {
-			urls, err := reddit.GetSubreddit(log, subreddit)
+			log.Debugf("Fetching %s URLs", subreddit)
+
+			urls, err := reddit.GetSubreddit(subreddit)
 			if err != nil {
 				return fmt.Errorf("fetching subreddit %s: %w", subreddit, err)
 			}
@@ -66,4 +79,20 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// SetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	subredditsKey := "subreddits"
+	viper.SetDefault(subredditsKey, []string{"earthporn", "abandonedporn", "dalle2", "midjourney"})
+
+	SetCmd.Flags().StringArrayVarP(
+		&setCmdOpts.Subreddits,
+		subredditsKey,
+		"s",
+		viper.GetStringSlice(subredditsKey),
+		"Subreddits to gather images from",
+	)
+
+	viper.BindPFlag(subredditsKey, SetCmd.Flags().Lookup(subredditsKey))
 }
+
+var setCmdOpts = struct {
+	Subreddits []string
+}{}
