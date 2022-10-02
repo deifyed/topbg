@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/topbg/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -38,8 +39,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default $HOME/.topbg.yaml)")
 
 	rootCmd.PersistentFlags().StringVarP(&rootCmdOpts.LogLevel, "log-level", "l", defaultLogLevel, "Set log level")
-	viper.BindEnv("LogLevel")
-	viper.BindPFlag("LogLevel", rootCmd.Flags().Lookup("log-level"))
+	viper.BindEnv(config.LogLevel)
+	viper.BindPFlag(config.LogLevel, rootCmd.Flags().Lookup("log-level"))
 }
 
 func initConfig() {
@@ -48,10 +49,16 @@ func initConfig() {
 		panic(fmt.Sprintf("acquiring home directory: %s", err.Error()))
 	}
 
+	cfgDir := path.Join(home, ".config", "topbg")
+
 	viper.AddConfigPath(home)
-	viper.AddConfigPath(path.Join(home, ".config", "topbg"))
+	viper.AddConfigPath(cfgDir)
 	viper.SetConfigName("topbg")
 	viper.SetEnvPrefix("topbg")
+
+	// Defaults
+	viper.SetDefault(config.TemporaryImageDir, os.TempDir())
+	viper.SetDefault(config.PermanentImageDir, path.Join(cfgDir, "images"))
 
 	if err = viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {

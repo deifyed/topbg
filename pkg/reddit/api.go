@@ -11,6 +11,8 @@ import (
 
 var validExtensions = []string{"jpg", "png"}
 
+const userAgent = "subreddit-background-fetcher-script (by /u/deifyed)"
+
 func GetSubreddit(name string) ([]string, error) {
 	posts, err := fetchTopPostsInSubreddit(name, 5)
 	if err != nil {
@@ -28,7 +30,7 @@ func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild
 		return nil, fmt.Errorf("preparing request: %w", err)
 	}
 
-	request.Header.Set("User-Agent", "subreddit-background-fetcher-script (by /u/deifyed)")
+	request.Header.Set("User-Agent", userAgent)
 
 	client := http.Client{
 		// 34 - 37 disables HTTP/2 to mitigate [this](https://www.reddit.com/r/redditdev/comments/uncu00/go_golang_clients_getting_403_blocked_responses/)

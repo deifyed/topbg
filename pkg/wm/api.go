@@ -7,18 +7,23 @@ import (
 	"os/exec"
 	"path"
 
+	"github.com/deifyed/topbg/pkg/config"
 	"github.com/spf13/afero"
+	"github.com/spf13/viper"
 )
 
 func SetBackground(fs *afero.Afero, imageType string, image io.Reader) error {
-	imagePath := path.Join(fs.GetTempDir(""), fmt.Sprintf("current-topbg.%s", imageType))
+	imagePath := getImagePath(imageType)
 
 	err := fs.WriteReader(imagePath, image)
 	if err != nil {
 		return fmt.Errorf("writing image: %w", err)
 	}
 
-	swayset(imagePath)
+	err = swayset(imagePath)
+	if err != nil {
+		return fmt.Errorf("setting background: %w", err)
+	}
 
 	return nil
 }
@@ -36,4 +41,11 @@ func swayset(imagePath string) error {
 	}
 
 	return nil
+}
+
+func getImagePath(imageType string) string {
+	return path.Join(
+		viper.GetString(config.TemporaryImageDir),
+		fmt.Sprintf("%s.%s", "current-topbg", imageType),
+	)
 }

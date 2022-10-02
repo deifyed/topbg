@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/deifyed/topbg/pkg/config"
 	"github.com/deifyed/topbg/pkg/reddit"
 	"github.com/deifyed/topbg/pkg/wm"
 	"github.com/spf13/afero"
@@ -20,7 +21,7 @@ var SetCmd = &cobra.Command{
 	Long:  `Grabs a random image from the configured list of subreddits`,
 	Args:  cobra.ExactArgs(0),
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(viper.GetStringSlice("subreddits")) == 0 {
+		if len(viper.GetStringSlice(config.Subreddits)) == 0 {
 			return errors.New("no subreddits configured")
 		}
 
@@ -33,7 +34,7 @@ func setRunE(cmd *cobra.Command, args []string) error {
 	fs := &afero.Afero{Fs: afero.NewOsFs()}
 	log := createLogger()
 
-	subreddits := viper.GetStringSlice("subreddits")
+	subreddits := viper.GetStringSlice(config.Subreddits)
 	imageURLs := make([]string, 0)
 
 	log.Debugf("Picking from following subreddits: %v", subreddits)
@@ -81,18 +82,20 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// SetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	subredditsKey := "subreddits"
-	viper.SetDefault(subredditsKey, []string{"earthporn", "abandonedporn", "dalle2", "midjourney"})
+	viper.SetDefault(
+		config.Subreddits,
+		[]string{"earthporn", "abandonedporn", "dalle2", "midjourney"},
+	)
 
 	SetCmd.Flags().StringArrayVarP(
 		&setCmdOpts.Subreddits,
-		subredditsKey,
+		config.Subreddits,
 		"s",
-		viper.GetStringSlice(subredditsKey),
+		viper.GetStringSlice(config.Subreddits),
 		"Subreddits to gather images from",
 	)
 
-	viper.BindPFlag(subredditsKey, SetCmd.Flags().Lookup(subredditsKey))
+	viper.BindPFlag(config.Subreddits, SetCmd.Flags().Lookup(config.Subreddits))
 }
 
 var setCmdOpts = struct {

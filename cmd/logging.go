@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/deifyed/topbg/pkg/config"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -16,7 +17,7 @@ func createLogger() *logrus.Logger {
 	log.Out = os.Stdout
 	log.Level = logrus.InfoLevel
 
-	targetLevel := viper.GetString("logLevel")
+	targetLevel := viper.GetString(config.LogLevel)
 
 	switch strings.ToLower(targetLevel) {
 	case "debug":
