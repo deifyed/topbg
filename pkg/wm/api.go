@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const TemporaryFilename = "current-topbg"
+
 func SetBackground(fs *afero.Afero, imageType string, image io.Reader) error {
 	imagePath := getImagePath(imageType)
 
@@ -46,6 +48,6 @@ func swayset(imagePath string) error {
 func getImagePath(imageType string) string {
 	return path.Join(
 		viper.GetString(config.TemporaryImageDir),
-		fmt.Sprintf("%s.%s", "current-topbg", imageType),
+		fmt.Sprintf("%s.%s", TemporaryFilename, imageType),
 	)
 }
