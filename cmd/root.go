@@ -5,9 +5,17 @@ import (
 	"os"
 	"path"
 
+	"github.com/deifyed/topbg/cmd/set"
 	"github.com/deifyed/topbg/pkg/config"
+	"github.com/deifyed/topbg/pkg/logging"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	log = logging.NewLogger()
+	fs  = &afero.Afero{Fs: afero.NewOsFs()}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -18,7 +26,7 @@ var rootCmd = &cobra.Command{
 and sets a random image as the desktop wallpaper.
 `,
 	SilenceUsage: true,
-	RunE:         setRunE,
+	RunE:         set.RunE(log, fs),
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

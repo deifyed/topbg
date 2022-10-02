@@ -1,7 +1,6 @@
-package cmd
+package logging
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -10,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func createLogger() *logrus.Logger {
+func NewLogger() *logrus.Logger {
 	log := logrus.Logger{}
 
 	log.Formatter = &logrus.JSONFormatter{PrettyPrint: true}
@@ -25,7 +24,7 @@ func createLogger() *logrus.Logger {
 	case "info":
 		log.Level = logrus.InfoLevel
 	default:
-		panic(fmt.Sprintf("Unknown log level %s", targetLevel))
+		log.Level = logrus.InfoLevel
 	}
 
 	return &log

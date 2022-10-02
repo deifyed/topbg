@@ -25,8 +25,3 @@ type topPostsResult struct {
 }
 
 const urlTemplate = "https://www.reddit.com/r/%s.json?limit=%d"
-
-type Logger interface {
-	Debug(...interface{})
-	Debugf(string, ...interface{})
-}
