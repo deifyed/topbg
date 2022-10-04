@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func RunE(log logging.Logger, fs *afero.Afero) func(cmd *cobra.Command, args []string) error {
+func RunE(log logging.Logger, fs *afero.Afero, name *string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		temporaryImagePath := viper.GetString(config.TemporaryImageDir)
 		imagesDirectory := viper.GetString(config.PermanentImageDir)
@@ -23,8 +23,14 @@ func RunE(log logging.Logger, fs *afero.Afero) func(cmd *cobra.Command, args []s
 			return fmt.Errorf("acquiring current image: %w", err)
 		}
 
+		filename := *name
+
+		if filename == "" {
+			filename = uuid.New().String()
+		}
+
 		err = fs.WriteReader(
-			path.Join(imagesDirectory, fmt.Sprintf("%s.%s", uuid.New().String(), img.Extension)),
+			path.Join(imagesDirectory, fmt.Sprintf("%s.%s", filename, img.Extension)),
 			img.Image,
 		)
 		if err != nil {

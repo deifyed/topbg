@@ -6,11 +6,16 @@ import (
 )
 
 // storeCmd represents the store command
-var storeCmd = &cobra.Command{
-	Use:   "store",
-	Short: "Store the most recent topbg set background permanently",
-	RunE:  store.RunE(log, fs),
-}
+var (
+	opts = struct {
+		Name string
+	}{}
+	storeCmd = &cobra.Command{
+		Use:   "store",
+		Short: "Store the most recent topbg set background permanently",
+		RunE:  store.RunE(log, fs, &opts.Name),
+	}
+)
 
 func init() {
 	rootCmd.AddCommand(storeCmd)
@@ -24,4 +29,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// storeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	storeCmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Store image with a certain name (default is UUID)")
 }
