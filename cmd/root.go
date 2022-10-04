@@ -20,11 +20,9 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "topbg",
-	Short: "Grabs top images from subreddits and sets the wallpaper with them",
-	Long: `TopBG is a CLI tool which downloads images from the top posts in the configured subreddits
-and sets a random image as the desktop wallpaper.
-`,
+	Use:          "topbg",
+	Short:        "Grabs top images from subreddits and sets the wallpaper with them",
+	Long:         `TopBG grabs a random image from the top posts of configured subreddits and sets it as the desktop wallpaper`,
 	SilenceUsage: true,
 	RunE:         set.RunE(log, fs),
 }
