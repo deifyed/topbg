@@ -7,12 +7,15 @@ TopBG grabs a random image from the top posts of configured subreddits and sets 
 ## Usage
 
 ```shell
-# To set a new wallpaper
+# Set a new random wallpaper
 topbg set
 
-# To permanently save the image previously set
+# Set wallpaper with image by index
+topbg set --index <index> # Find index with topbg list
+
+# Permanently save the image previously set
 topbg store
 
-# List stored images
+# List stored images with indexes
 topbg list
 ```
