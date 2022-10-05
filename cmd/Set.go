@@ -22,7 +22,7 @@ var SetCmd = &cobra.Command{
 
 		return nil
 	},
-	RunE: set.RunE(log, fs),
+	RunE: set.RunE(log, fs, &setCmdOpts.Index),
 }
 
 func init() {
@@ -41,9 +41,12 @@ func init() {
 		"Subreddits to gather images from",
 	)
 
+	SetCmd.Flags().IntVarP(&setCmdOpts.Index, "index", "i", -1, "Set wallpaper by index to stored image")
+
 	viper.BindPFlag(config.Subreddits, SetCmd.Flags().Lookup(config.Subreddits))
 }
 
 var setCmdOpts = struct {
 	Subreddits []string
+	Index      int
 }{}
