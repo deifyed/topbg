@@ -2,31 +2,22 @@ package list
 
 import (
 	"fmt"
-	"sort"
+	"path"
 
-	"github.com/deifyed/topbg/pkg/config"
+	"github.com/deifyed/topbg/pkg/images"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func RunE(fs *afero.Afero) func(*cobra.Command, []string) error {
 	return func(c *cobra.Command, s []string) error {
-		files, err := fs.ReadDir(viper.GetString(config.PermanentImageDir))
+		paths, err := images.ListPaths(fs)
 		if err != nil {
-			return fmt.Errorf("listing files in directory: %w", err)
+			return fmt.Errorf("listing paths: %w", err)
 		}
 
-		imageNames := make([]string, len(files))
-
-		for index, file := range files {
-			imageNames[index] = file.Name()
-		}
-
-		imageNames = sort.StringSlice(imageNames)
-
-		for index, item := range imageNames {
-			fmt.Printf("[%d] %s\n", index, item)
+		for index, p := range paths {
+			fmt.Printf("[%d] %s\n", index, path.Base(p))
 		}
 
 		return nil
