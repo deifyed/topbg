@@ -12,4 +12,7 @@ topbg set
 
 # To permanently save the image previously set
 topbg store
+
+# List stored images
+topbg list
 ```
