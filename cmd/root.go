@@ -42,7 +42,12 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default $HOME/.topbg.yaml)")
+	rootCmd.PersistentFlags().StringVar(
+		&configFile,
+		"config",
+		"",
+		"config file (default $HOME/.config/topbg/topbg.yaml)",
+	)
 
 	rootCmd.PersistentFlags().StringVarP(&rootCmdOpts.LogLevel, "log-level", "l", defaultLogLevel, "Set log level")
 	viper.BindEnv(config.LogLevel)
