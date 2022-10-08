@@ -19,3 +19,15 @@ topbg store
 # List stored images with indexes
 topbg list
 ```
+
+## Installation
+
+Requires Go 1.19
+
+```shell
+# Install topbg into ~/.local/bin
+make build && make install
+
+# To adjust installation dir, use INSTALL_DIR
+make build && make install INSTALL_DIR=/usr/local/bin
+```
