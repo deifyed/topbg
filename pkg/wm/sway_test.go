@@ -21,6 +21,11 @@ func TestInjectBackgroundConfig(t *testing.T) {
 			withConfig:    strings.NewReader(configSnippet),
 			withImagePath: "/home/user/images/mock-img.jpg",
 		},
+		{
+			name:          "Should work when adding to config with previously set background",
+			withConfig:    strings.NewReader(configSnippetWithBackground),
+			withImagePath: "/home/user/images/mock-img.jpg",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -55,7 +60,8 @@ func mustRead(t *testing.T, fs *afero.Afero, path string) []byte {
 	return data
 }
 
-const configSnippet = `#
+const (
+	configSnippet = `#
 # Status Bar:
 #
 # Read man 5 sway-bar for more information about this section.
@@ -84,3 +90,10 @@ bar {
 include /etc/sway/config.d/*
 include /home/user/.config/sway/config.d/*
 `
+	configSnippetWithBackground = configSnippet + `
+
+### TOPBG START INJECTED CONFIG ###
+output * bg /home/user/images/old-mock-img.jpg stretch
+### TOPBG END INJECTED CONFIG ###
+`
+)

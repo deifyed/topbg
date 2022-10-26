@@ -2,6 +2,7 @@ package wm
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os/exec"
 	"text/template"
@@ -30,6 +31,11 @@ func injectBackgroundConfig(fs *afero.Afero, configPath string, absoluteImagePat
 		return fmt.Errorf("reading: %w", err)
 	}
 
+	cleanedConfig, err := deleteOldInjectedBackgroundConfig(content)
+	if err != nil {
+		return fmt.Errorf("deleting old injected background config: %w", err)
+	}
+
 	t, err := template.New("").Parse(bgConfigTemplate)
 	if err != nil {
 		return fmt.Errorf("parsing template: %w", err)
@@ -42,17 +48,17 @@ func injectBackgroundConfig(fs *afero.Afero, configPath string, absoluteImagePat
 		ConfigEndSuffix   string
 		AbsoluteImagePath string
 	}{
-		ConfigStartPrefix: bgConfigPrefix,
-		ConfigEndSuffix:   bgConfigSuffix,
+		ConfigStartPrefix: bgConfigStartDelimiter,
+		ConfigEndSuffix:   bgConfigEndDelimiter,
 		AbsoluteImagePath: absoluteImagePath,
 	})
 	if err != nil {
 		return fmt.Errorf("executing template: %w", err)
 	}
 
-	content = append(content, buf.Bytes()...)
+	cleanedConfig = append(cleanedConfig, buf.Bytes()...)
 
-	err = fs.WriteReader(configPath, bytes.NewReader(content))
+	err = fs.WriteReader(configPath, bytes.NewReader(cleanedConfig))
 	if err != nil {
 		return fmt.Errorf("writing: %w", err)
 	}
@@ -60,10 +66,51 @@ func injectBackgroundConfig(fs *afero.Afero, configPath string, absoluteImagePat
 	return nil
 }
 
+func deleteOldInjectedBackgroundConfig(original []byte) ([]byte, error) {
+	var (
+		ignore        bool
+		foundStart    bool
+		foundEnd      bool
+		cleanedConfig = make([]byte, 0)
+	)
+
+	for _, line := range bytes.Split(original, []byte("\n")) {
+		if bytes.HasPrefix(line, []byte(bgConfigStartDelimiter)) {
+			foundStart = true
+			ignore = true
+		}
+
+		if bytes.HasPrefix(line, []byte(bgConfigEndDelimiter)) {
+			foundEnd = true
+			ignore = false
+
+			continue
+		}
+
+		if ignore {
+			continue
+		}
+
+		line = append(line, []byte("\n")...)
+		cleanedConfig = append(cleanedConfig, line...)
+	}
+
+	switch {
+	case !foundStart && !foundEnd:
+		return original, nil
+	case !foundStart && foundEnd:
+		return nil, errors.New("found end of injected background config but not start")
+	case foundStart && !foundEnd:
+		return nil, errors.New("found start of injected background config but not end")
+	}
+
+	return cleanedConfig, nil
+}
+
 const (
-	bgConfigPrefix   = "### TOPBG START INJECTED CONFIG ###"
-	bgConfigSuffix   = "### TOPBG END INJECTED CONFIG ###"
-	bgConfigTemplate = `
+	bgConfigStartDelimiter = "### TOPBG START INJECTED CONFIG ###"
+	bgConfigEndDelimiter   = "### TOPBG END INJECTED CONFIG ###"
+	bgConfigTemplate       = `
 {{ .ConfigStartPrefix }}
 output * bg {{ .AbsoluteImagePath }} stretch
 {{ .ConfigEndSuffix }}
