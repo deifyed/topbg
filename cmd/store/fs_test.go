@@ -42,8 +42,11 @@ func TestFindCurrentImageInDirectory(t *testing.T) {
 			fs := &afero.Afero{Fs: afero.NewMemMapFs()}
 
 			for _, item := range tc.withExistingPaths {
-				fs.MkdirAll(path.Dir(item), 0o700)
-				fs.WriteReader(item, strings.NewReader(""))
+				err := fs.MkdirAll(path.Dir(item), 0o700)
+				assert.NoError(t, err)
+
+				err = fs.WriteReader(item, strings.NewReader(""))
+				assert.NoError(t, err)
 			}
 
 			img, err := findCurrentImageInDirectory(fs, tc.withDirectory, tc.withFilename)

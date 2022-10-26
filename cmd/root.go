@@ -50,8 +50,12 @@ func init() {
 	)
 
 	rootCmd.PersistentFlags().StringVarP(&rootCmdOpts.LogLevel, "log-level", "l", defaultLogLevel, "Set log level")
-	viper.BindEnv(config.LogLevel)
-	viper.BindPFlag(config.LogLevel, rootCmd.Flags().Lookup("log-level"))
+
+	err := viper.BindEnv(config.LogLevel)
+	cobra.CheckErr(err)
+
+	err = viper.BindPFlag(config.LogLevel, rootCmd.Flags().Lookup("log-level"))
+	cobra.CheckErr(err)
 }
 
 func initConfig() {
@@ -78,10 +82,12 @@ func initConfig() {
 	}
 }
 
-var configFile string
-var rootCmdOpts struct {
-	LogLevel string
-}
+var (
+	configFile  string
+	rootCmdOpts struct {
+		LogLevel string
+	}
+)
 
 const defaultLogLevel = "info"
 

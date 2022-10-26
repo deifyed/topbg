@@ -43,7 +43,8 @@ func init() {
 
 	SetCmd.Flags().IntVarP(&setCmdOpts.Index, "index", "i", -1, "Set wallpaper by index to stored image")
 
-	viper.BindPFlag(config.Subreddits, SetCmd.Flags().Lookup(config.Subreddits))
+	err := viper.BindPFlag(config.Subreddits, SetCmd.Flags().Lookup(config.Subreddits))
+	cobra.CheckErr(err)
 }
 
 var setCmdOpts = struct {

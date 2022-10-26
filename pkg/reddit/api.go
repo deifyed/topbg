@@ -104,11 +104,7 @@ func valid(item topPostsResultDataChild) bool {
 
 	extension := strings.ToLower(reverse(strings.Split(url, "."))[0])
 
-	if !contains(validExtensions, extension) {
-		return false
-	}
-
-	return true
+	return contains(validExtensions, extension)
 }
 
 func reverse(items []string) []string {
