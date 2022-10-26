@@ -17,7 +17,7 @@ func TestInjectBackgroundConfig(t *testing.T) {
 		withImagePath string
 	}{
 		{
-			name:          "Should work",
+			name:          "Should work when adding to config without previously set background",
 			withConfig:    strings.NewReader(configSnippet),
 			withImagePath: "/home/user/images/mock-img.jpg",
 		},
@@ -41,7 +41,7 @@ func TestInjectBackgroundConfig(t *testing.T) {
 
 			g := goldie.New(t)
 
-			g.Assert(t, "config", mustRead(t, fs, configPath))
+			g.Assert(t, t.Name(), mustRead(t, fs, configPath))
 		})
 	}
 }
