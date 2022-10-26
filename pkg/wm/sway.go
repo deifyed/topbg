@@ -50,9 +50,9 @@ func injectBackgroundConfig(fs *afero.Afero, configPath string, absoluteImagePat
 		return fmt.Errorf("executing template: %w", err)
 	}
 
-	newCfgContent := append(content, buf.Bytes()...)
+	content = append(content, buf.Bytes()...)
 
-	err = fs.WriteReader(configPath, bytes.NewReader(newCfgContent))
+	err = fs.WriteReader(configPath, bytes.NewReader(content))
 	if err != nil {
 		return fmt.Errorf("writing: %w", err)
 	}
