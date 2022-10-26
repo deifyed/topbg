@@ -1,0 +1,32 @@
+#
+# Status Bar:
+#
+# Read man 5 sway-bar for more information about this section.
+bar {
+    position top
+
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+    #status_command while ~/.config/sway/status.sh; do sleep 1; done
+    #status_command while ~/.config/sway/status_bar.py; do sleep 1; done
+    status_command while status; do sleep 1; done
+
+    colors {
+			# Status line font
+			statusline #a89984
+			# Status line background
+			background #282828
+
+			# border main font
+			focused_workspace #ebdbb2 #ebdbb2 #282828
+			inactive_workspace #928374 #928374 #282828
+			urgent_workspace #fb4934 #928374 #fb4934
+    }
+}
+
+include /etc/sway/config.d/*
+include /home/user/.config/sway/config.d/*
+
+### TOPBG START INJECTED CONFIG ###
+output * bg /home/user/images/mock-img.jpg stretch
+### TOPBG END INJECTED CONFIG ###
