@@ -42,7 +42,7 @@ func setRandomBackground(log logging.Logger, fs *afero.Afero) error {
 	for _, subreddit := range subreddits {
 		log.Debugf("Fetching %s URLs", subreddit)
 
-		urls, err := reddit.GetSubreddit(subreddit)
+		urls, err := reddit.GetSubreddit(log, subreddit)
 		if err != nil {
 			return fmt.Errorf("fetching subreddit %s: %w", subreddit, err)
 		}

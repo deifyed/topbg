@@ -2,6 +2,11 @@ package reddit
 
 import "io"
 
+type logger interface {
+	Debug(args ...interface{})
+	Debugf(format string, args ...interface{})
+}
+
 type Image struct {
 	Type  string
 	Image io.Reader

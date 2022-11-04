@@ -3,9 +3,11 @@ package reddit
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -13,8 +15,10 @@ var validExtensions = []string{"jpg", "png"}
 
 const userAgent = "subreddit-background-fetcher-script (by /u/deifyed)"
 
-func GetSubreddit(name string) ([]string, error) {
-	posts, err := fetchTopPostsInSubreddit(name, 5)
+var reRateLimit = regexp.MustCompile(`.*href=mailto:ratelimit@reddit.com.*`)
+
+func GetSubreddit(log logger, name string) ([]string, error) {
+	posts, err := fetchTopPostsInSubreddit(log, name, 5)
 	if err != nil {
 		return nil, fmt.Errorf("fetching posts: %w", err)
 	}
@@ -22,7 +26,7 @@ func GetSubreddit(name string) ([]string, error) {
 	return extractURLs(posts), nil
 }
 
-func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild, error) {
+func fetchTopPostsInSubreddit(log logger, name string, limit int) ([]topPostsResultDataChild, error) {
 	url := fmt.Sprintf(urlTemplate, name, limit)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -39,7 +43,6 @@ func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild
 			TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
 		},
 	}
-
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("executing request: %w", err)
@@ -48,6 +51,10 @@ func fetchTopPostsInSubreddit(name string, limit int) ([]topPostsResultDataChild
 	rawBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("buffering body: %w", err)
+	}
+
+	if reRateLimit.Match(rawBody) {
+		return nil, errors.New("rate limit exceeded")
 	}
 
 	var result topPostsResult
