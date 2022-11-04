@@ -4,21 +4,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/deifyed/topbg/pkg/config"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
-func NewLogger() *logrus.Logger {
-	log := logrus.Logger{}
-
+func ConfigureLogger(log *logrus.Logger, level string) {
 	log.Formatter = &logrus.JSONFormatter{PrettyPrint: true}
 	log.Out = os.Stdout
-	log.Level = logrus.InfoLevel
 
-	targetLevel := viper.GetString(config.LogLevel)
-
-	switch strings.ToLower(targetLevel) {
+	switch strings.ToLower(level) {
 	case "debug":
 		log.Level = logrus.DebugLevel
 	case "info":
@@ -26,6 +19,4 @@ func NewLogger() *logrus.Logger {
 	default:
 		log.Level = logrus.InfoLevel
 	}
-
-	return &log
 }

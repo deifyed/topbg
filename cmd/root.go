@@ -8,13 +8,14 @@ import (
 	"github.com/deifyed/topbg/cmd/set"
 	"github.com/deifyed/topbg/pkg/config"
 	"github.com/deifyed/topbg/pkg/logging"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	log = logging.NewLogger()
+	log = logrus.New()
 	fs  = &afero.Afero{Fs: afero.NewOsFs()}
 )
 
@@ -51,11 +52,10 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&rootCmdOpts.LogLevel, "log-level", "l", defaultLogLevel, "Set log level")
 
-	err := viper.BindEnv(config.LogLevel)
+	err := viper.BindPFlag(config.LogLevel, rootCmd.PersistentFlags().Lookup("log-level"))
 	cobra.CheckErr(err)
 
-	err = viper.BindPFlag(config.LogLevel, rootCmd.Flags().Lookup("log-level"))
-	cobra.CheckErr(err)
+	viper.AutomaticEnv()
 }
 
 func initConfig() {
@@ -72,6 +72,7 @@ func initConfig() {
 	viper.SetEnvPrefix("topbg")
 
 	// Defaults
+	viper.SetDefault(config.LogLevel, defaultLogLevel)
 	viper.SetDefault(config.TemporaryImageDir, os.TempDir())
 	viper.SetDefault(config.PermanentImageDir, path.Join(cfgDir, "images"))
 
@@ -80,7 +81,17 @@ func initConfig() {
 			panic(fmt.Sprintf("reading configuration: %s", err.Error()))
 		}
 	}
+
+	logging.ConfigureLogger(log, viper.GetString(config.LogLevel))
+
+	if viper.ConfigFileUsed() == "" {
+		log.Info("No configuration file provided, using defaults")
+	} else {
+		log.Debugf("Using configuration file: %s", viper.ConfigFileUsed())
+	}
 }
+
+const defaultLogLevel = "info"
 
 var (
 	configFile  string
@@ -88,8 +99,6 @@ var (
 		LogLevel string
 	}
 )
-
-const defaultLogLevel = "info"
 
 func intPtr(i int) *int {
 	return &i
