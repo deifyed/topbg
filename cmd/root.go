@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 	Short:        "Grabs top images from subreddits and sets the wallpaper with them",
 	Long:         `TopBG grabs a random image from the top posts of configured subreddits and sets it as the desktop wallpaper`,
 	SilenceUsage: true,
-	RunE:         set.RunE(log, fs, intPtr(-1)),
+	RunE:         set.RunE(log, fs, &setCmdOpts),
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
